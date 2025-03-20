@@ -1,42 +1,36 @@
-# app_V0.py
-
-from flask import Flask, jsonify, request
-from flask_cors import CORS  # Import flask-cors to handle Cross-Origin requests
+import logging
+from flask import Flask, jsonify, request, render_template
+from flask_cors import CORS  
 import json
-# Import both scraper functions: get_live_matches and get_match_details
-from scrapper import get_live_matches, get_match_details
+from scrapper.scrapper import get_live_matches, get_match_details  # Importing scrapers
 
-# Initialize the Flask application
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Initialize Flask application
+app = Flask(__name__, template_folder="frontend", static_folder="frontend")
+CORS(app)  # Enable CORS to allow requests from different origins
 
-# Home route to verify that the API is running
+# Suppress Flask request logs (only show errors)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+# Route to render the main page
 @app.route('/')
 def home():
-    return "Euroliga LiveScore API is running."
+    return render_template("index.html")  # Load the main HTML page
 
-# Endpoint to provide live matches data
+# API endpoint to fetch live match data in JSON format
 @app.route("/api/live_matches", methods=["GET"])
-def live_matches():
-    # Call the function to scrape live match data
-    matches = get_live_matches()
-    # Return the match data as a JSON response with pretty-print formatting
-    return app.response_class(
-        response=json.dumps(matches, indent=4, ensure_ascii=False, sort_keys=False),
-        mimetype="application/json"
-    )
+def api_live_matches():
+    matches = get_live_matches()  # Scrape live matches
+    return jsonify(matches)  # Return match data as JSON
 
-# Endpoint to provide detailed match data
+# API endpoint to fetch detailed match data in JSON format
 @app.route("/api/match_details", methods=["GET"])
 def match_details():
-    # Retrieve the match detail URL from the query string parameter 'url'
-    detail_url = request.args.get("url")
+    detail_url = request.args.get("url")  # Get match URL from request parameters
     if not detail_url:
-        return jsonify({"error": "No URL provided"}), 400
-    # Call the function to scrape detailed match data from the provided URL
-    details = get_match_details(detail_url)
-    return jsonify(details)
+        return jsonify({"error": "No URL provided"}), 400  # Return error if no URL
+    details = get_match_details(detail_url)  # Scrape match details
+    return jsonify(details)  # Return detailed match data as JSON
 
 if __name__ == "__main__":
-    # Run the application on host 0.0.0.0 to be accessible on the local network, port 5000, with debug mode enabled
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)  # Start Flask server
