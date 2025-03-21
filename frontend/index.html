@@ -1,48 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Euroleague Live Scores</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Euroleague Live Scores</h1>
-    
-    <div id="matches-container">
-        <!-- Live matches will be dynamically inserted here -->
-    </div>
-    
-    <div id="match-details" class="hidden">
-        <h2>Match Details</h2>
-        <table id="score-table">
-            <thead>
-                <tr>
-                    <th>Quarter</th>
-                    <th>Home</th>
-                    <th>Away</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Quarter scores will be inserted here -->
-            </tbody>
-        </table>
+    <h1>Euroleague Live Dashboard</h1>
 
-        <h3>Top 3 Players</h3>
-        <table id="top-players-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Team</th>
-                    <th>Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Top players will be inserted here -->
-            </tbody>
-        </table>
+    <!-- Contenedor para tarjetas de partidos -->
+    <div id="matches-container"></div>
+
+    <!-- Contenedor oculto para los detalles -->
+    <div id="match-details" class="hidden">
+        <!-- Aquí insertaremos los bloques dinámicamente desde script.js -->
     </div>
-    
-    <script src="{{ url_for('static', filename='script.js') }}"></script> <!-- JavaScript file for dynamic updates -->
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
