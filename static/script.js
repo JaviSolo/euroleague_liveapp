@@ -67,6 +67,7 @@ function loadMatchDetails(url, team1, team2) {
     fetch(`/api/match_details?url=${encodeURIComponent(url)}`)
         .then(response => response.json())
         .then(data => {
+            console.log("DEBUG – full match details:", data); //DEBUG
             const matchDetails = document.getElementById("match-details");
             matchDetails.classList.remove("hidden");
             matchDetails.innerHTML = "";
@@ -158,6 +159,37 @@ function loadMatchDetails(url, team1, team2) {
             topPlayersTable.appendChild(topPlayersBody);
             topBox.appendChild(topPlayersTable);
             detailBox.appendChild(topBox);
+
+            // Contenedor para estadísticas de equipo (Team Statistics)
+            const teamStatsBox = document.createElement("div");
+            teamStatsBox.classList.add("details-section");
+
+            const teamStatsTitle = document.createElement("h3");
+            teamStatsTitle.textContent = "Team Statistics";
+            teamStatsBox.appendChild(teamStatsTitle);
+            console.log("DEBUG – team_statistics content:", data.team_statistics); //DEBUG
+
+            if (!data.team_statistics || data.team_statistics === "Not found" || data.team_statistics.length === 0) {
+                const emptyRow = document.createElement("p");
+                emptyRow.textContent = "No hay Team Statistics disponibles para este partido.";
+                teamStatsBox.appendChild(emptyRow);
+            } else {
+                data.team_statistics.forEach(stat => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex";
+                    row.style.justifyContent = "space-between";
+                    row.style.padding = "4px 0";
+                    row.innerHTML = `
+                        <span><strong>${stat.home}</strong></span>
+                        <span>${stat.label}</span>
+                        <span><strong>${stat.away}</strong></span>
+                    `;
+                    teamStatsBox.appendChild(row);
+                });
+            }
+
+            detailBox.appendChild(teamStatsBox);
+
 
             matchDetails.appendChild(detailBox);
         })

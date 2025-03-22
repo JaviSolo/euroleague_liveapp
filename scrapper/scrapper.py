@@ -20,7 +20,7 @@ def create_driver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-def get_live_matches(url="https://www.flashscore.com/basketball/austria/superliga/"):
+def get_live_matches(url="https://www.flashscore.com/basketball/china/cba/"):
     """
     Scrapea los partidos en vivo de una liga de baloncesto desde Flashscore.
     Devuelve una lista de diccionarios con datos básicos de cada partido.
@@ -58,7 +58,7 @@ def get_live_matches(url="https://www.flashscore.com/basketball/austria/superlig
                 if score_elements and len(score_elements) >= 2:
                     score = f"{score_elements[0].text.strip()} - {score_elements[1].text.strip()}"
 
-                # Obtener cuarto y tiempo
+                # Obtener cuarto y tiempo de juego correctamente
                 quarter = ""
                 time = ""
 
@@ -71,7 +71,7 @@ def get_live_matches(url="https://www.flashscore.com/basketball/austria/superlig
                     elif len(raw_text) == 1:
                         quarter = raw_text[0]
                         time = ""
-                        
+
                 live_matches.append(OrderedDict([
                     ("team1", team1),
                     ("team2", team2),
@@ -86,7 +86,7 @@ def get_live_matches(url="https://www.flashscore.com/basketball/austria/superlig
 
 def get_match_details(detail_url):
     """
-    Scrapea los detalles de un partido en vivo (puntos por cuarto, top 3 jugadores).
+    Scrapea los detalles de un partido en vivo (puntos por cuarto, top 3 jugadores, estadísticas básicas por equipo).
     """
     driver = create_driver()
     driver.get(detail_url)
@@ -104,6 +104,7 @@ def get_match_details(detail_url):
     details["home_quarter_scores"] = []
     details["away_quarter_scores"] = []
     details["top_player_stats"] = []
+    details["team_statistics"] = []
 
     # Obtener nombre de los equipos desde el contenedor superior
     try:
@@ -152,8 +153,42 @@ def get_match_details(detail_url):
 
         details["top_player_stats"] = top_players
     except Exception as e:
-        print("No player stats found or error scraping them:", e)
         details["top_player_stats"] = "Not found"
+
+    # Estadísticas por equipo (Field Goals Attempted, FG%, Rebounds)
+    try:
+        stats_labels = ["Field Goals Attempted", "Field Goals %", "Total Rebounds"]
+        parsed_stats = []
+
+        rows = driver.find_elements(By.CSS_SELECTOR, "[class^='wcl-row_']")
+        
+        for row in rows:
+            try:
+                label_elem = row.find_element(By.CSS_SELECTOR, "[data-testid='wcl-statistics-category'] [data-testid='wcl-scores-simpleText-01']")
+                label = label_elem.text.strip()
+
+                if label in stats_labels:
+                    home_val_elem = row.find_element(By.CSS_SELECTOR, "[class*='wcl-homeValue'] [data-testid='wcl-scores-simpleText-01']")
+                    away_val_elem = row.find_element(By.CSS_SELECTOR, "[class*='wcl-awayValue'] [data-testid='wcl-scores-simpleText-01']")
+                    home_val = home_val_elem.text.strip()
+                    away_val = away_val_elem.text.strip()
+
+                    parsed_stats.append({
+                        "label": label,
+                        "home": home_val,
+                        "away": away_val
+                    })
+
+            except Exception as inner_error:
+                continue
+
+        if parsed_stats:
+            details["team_statistics"] = parsed_stats
+        else:
+            details["team_statistics"] = "Not found"
+
+    except Exception as e:
+        details["team_statistics"] = "Not found"
 
     driver.quit()
     return details
