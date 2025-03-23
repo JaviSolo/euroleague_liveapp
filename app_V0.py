@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from scrapper.scrapper import get_live_matches, get_match_details
+from euroleague_api_wrappers.standings_wrapper import get_euroleague_standings
 
 # Inicializa la aplicación Flask
 app = Flask(__name__, template_folder="frontend", static_folder="static")
@@ -31,6 +32,13 @@ def match_details():
         return jsonify({"error": "No URL provided"}), 400
     details = get_match_details(detail_url)
     return jsonify(details)
+
+# Retrieve Standings from euroleague_api
+
+@app.route("/api/euroleague_standings")
+def euroleague_standings():
+    standings = get_euroleague_standings()
+    return jsonify(standings)
 
 # Ejecuta la app en modo debug (localhost)
 if __name__ == "__main__":

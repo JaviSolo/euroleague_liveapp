@@ -3,7 +3,9 @@
 
 document.addEventListener("DOMContentLoaded", function () {
     fetchLiveMatches();
-    setInterval(fetchLiveMatches, 10000); // Actualizar cada 10 segundos
+    fetchStandings();
+    setInterval(fetchLiveMatches, 10000); // Actualizar Live cada 10 segundos
+    setInterval(fetchStandings, 1200000); // Actualizar Standings cada 10 segundos
 });
 
 let currentDetailURL = null;
@@ -195,3 +197,42 @@ function loadMatchDetails(url, team1, team2) {
         })
         .catch(error => console.error("Error fetching match details:", error));
 }
+function fetchStandings() {
+    fetch("/api/euroleague_standings")
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById("standings-container");
+            if (!container) return;
+
+            container.innerHTML = "<h2>Current Standings</h2>";
+
+            const table = document.createElement("table");
+
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Team</th>
+                        <th>W</th>
+                        <th>L</th>
+                        <th>Win%</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(team => `
+                        <tr>
+                            <td>${team.position}</td>
+                            <td>${team["club.name"]}</td>
+                            <td>${team.gamesWon}</td>
+                            <td>${team.gamesLost}</td>
+                            <td>${team.winPercentage}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            `;
+
+            container.appendChild(table);
+        })
+        .catch(error => console.error("Error fetching standings:", error));
+}
+
