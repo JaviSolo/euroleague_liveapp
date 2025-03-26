@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from scrapper.scrapper import get_live_matches, get_match_details
 from euroleague_api_wrappers.standings_wrapper import get_euroleague_standings
+from euroleague_api_wrappers.scheduled_games_wrapper import get_scheduled_matches
+
 
 # Inicializa la aplicación Flask
 app = Flask(__name__, template_folder="frontend", static_folder="static")
@@ -12,11 +14,6 @@ CORS(app)
 def home():
     return render_template("index.html")
 
-# Ruta que renderiza los partidos en vivo en formato HTML (no se está usando actualmente)
-@app.route("/live_matches", methods=["GET"])
-def live_matches():
-    matches = get_live_matches()
-    return render_template("live_matches.html", matches=matches)
 
 # API que devuelve partidos en vivo como JSON
 @app.route("/api/live_matches", methods=["GET"])
@@ -39,6 +36,14 @@ def match_details():
 def euroleague_standings():
     standings = get_euroleague_standings()
     return jsonify(standings)
+
+#Next scheduled games from euroleague_api
+
+@app.route("/api/scheduled_matches", methods=["GET"])
+def scheduled_matches():
+    matches = get_scheduled_matches()
+    return jsonify(matches)
+
 
 # Ejecuta la app en modo debug (localhost)
 if __name__ == "__main__":

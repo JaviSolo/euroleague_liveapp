@@ -1,0 +1,29 @@
+# === PYTHON BACKEND ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+*.log
+
+# Virtualenv (ahora dentro de /backend)
+venv/
+backend/venv/
+
+# === FLASK STATIC/TEMPLATES (si se usaban) ===
+backend/static/
+backend/templates/
+
+# === FRONTEND (React + Vite) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.DS_Store
+
+# === SYSTEM FILES ===
+.DS_Store
+Thumbs.db
+.env
+.env.*
+
+# === VSCode config (opcional) ===
+.vscode/
