@@ -20,7 +20,7 @@ def create_driver():
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-def get_live_matches(url="https://www.flashscore.com/basketball/usa/nba/"):
+def get_live_matches(url="https://www.flashscore.com/basketball/philippines/mpbl/"):
     """
     Scrapea los partidos en vivo de una liga de baloncesto desde Flashscore.
     Devuelve una lista de diccionarios con datos básicos de cada partido.
