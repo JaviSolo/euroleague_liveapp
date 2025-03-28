@@ -38,7 +38,7 @@ def parse_scheduled_matches(xml_data):
 
     return matches_by_gameday
 
-def get_scheduled_matches():
+def get_scheduled_matches(round=None):
     xml_data = get_scheduled_matches_from_api_v1()
     if not xml_data:
         return []
@@ -47,7 +47,15 @@ def get_scheduled_matches():
     if not grouped_matches:
         return []
 
-    # Elegimos el gameday más próximo con partidos futuros
+    # Si se pasa un número de ronda, filtramos los partidos por esa ronda
+    if round:
+        if round in grouped_matches:
+            return grouped_matches[round]
+        else:
+            return []
+
+    # Si no se pasa ronda, devolvemos los partidos de la primera jornada
     next_gameday = sorted(grouped_matches.keys())[0]
     print(f"📅 Mostrando partidos programados de la jornada {next_gameday}")
     return grouped_matches[next_gameday]
+

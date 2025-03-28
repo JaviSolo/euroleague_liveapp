@@ -78,8 +78,22 @@ def euroleague_standings():
 
 @app.route("/api/scheduled_matches", methods=["GET"])
 def scheduled_matches():
-    matches = get_scheduled_matches()
-    return jsonify(matches)
+    # Obtener el parámetro "round" de la query string
+    round_param = request.args.get("round", default=None, type=int)
+    
+    try:
+        # Si el parámetro de round está presente, lo pasamos al wrapper
+        if round_param:
+            matches = get_scheduled_matches(round=round_param)
+        else:
+            # Si no se pasa ningún parámetro, devolvemos todos los partidos programados
+            matches = get_scheduled_matches()
+        
+        return jsonify(matches)
+    
+    except Exception as e:
+        print(f"❌ Error en /api/scheduled_matches: {e}")
+        return jsonify([]), 500
 
 # ✅ Lanza el hilo del scrapper dentro del main
 if __name__ == "__main__":
