@@ -2,6 +2,7 @@ import React from "react";
 import StandingsTable from "./components/StandingsTable";
 import ScheduledMatches from "./components/ScheduledMatches";
 import LiveMatches from "./components/LiveMatches";
+import PlayedMatches from "./components/PlayedMatches"; // ✅ CORREGIDO el import
 
 function App() {
   return (
@@ -14,6 +15,12 @@ function App() {
 
       {/* Main Content Section */}
       <div className="max-w-7xl mx-auto space-y-6">
+
+        {/* Played Matches Section */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <PlayedMatches />
+        </div>
+
         {/* Live Matches Section */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
           <LiveMatches />

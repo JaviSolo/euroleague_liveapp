@@ -1,5 +1,5 @@
 from datetime import datetime
-from euroleague_api.src.euroleague_api.EuroLeagueData import EuroLeagueData
+from euroleague_api.EuroLeagueData import EuroLeagueData
 
 def get_current_season_code() -> int:
     """

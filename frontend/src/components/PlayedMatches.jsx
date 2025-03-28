@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import TeamDisplay from "./TeamDisplay";
 import MatchCard from "./MatchCard";
 
-const ScheduledMatches = () => {
+const PlayedMatches = () => {
   const [matches, setMatches] = useState([]);
   const [standings, setStandings] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/scheduled_matches")
+    fetch("http://localhost:5000/api/played_matches")
       .then((res) => res.json())
       .then((data) => setMatches(data))
       .catch((err) => {
-        console.error("Error fetching scheduled matches:", err);
+        console.error("Error fetching played matches:", err);
         setMatches([]);
       });
 
@@ -21,7 +21,9 @@ const ScheduledMatches = () => {
       .catch((err) => console.error("Error fetching standings:", err));
   }, []);
 
-  const normalizeName = (name) => name.toLowerCase().split(" ")[0];
+  const normalizeName = (name) => {
+    return name.toLowerCase().split(" ")[0];
+  };
 
   const getTeamData = (teamName) => {
     const target = normalizeName(teamName);
@@ -34,26 +36,14 @@ const ScheduledMatches = () => {
     return team;
   };
 
-  const formatDateTime = (datetimeStr) => {
-    const date = new Date(datetimeStr);
-    return date.toLocaleString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <div className="p-4">
       <h2 className="text-3xl font-bold text-center text-blue-400 tracking-tight mb-6">
-        Upcoming Matches
+        Played Matches
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {matches.length === 0 ? (
-          <p className="text-gray-400 text-center col-span-full">
-            No upcoming matches available
-          </p>
+          <p className="text-gray-500 text-center col-span-full">No played matches found</p>
         ) : (
           matches.map((match, index) => {
             const homeTeam = getTeamData(match.home_team);
@@ -62,8 +52,8 @@ const ScheduledMatches = () => {
             return (
               <MatchCard
                 key={index}
-                status={`${formatDateTime(match.datetime)} · ${match.arena}`}
-                score="Scheduled"
+                status="Finished"
+                score={`${match.home_score} - ${match.away_score}`}
                 home={<TeamDisplay team={homeTeam} fallback={match.home_team} />}
                 away={<TeamDisplay team={awayTeam} fallback={match.away_team} />}
               />
@@ -75,4 +65,4 @@ const ScheduledMatches = () => {
   );
 };
 
-export default ScheduledMatches;
+export default PlayedMatches;

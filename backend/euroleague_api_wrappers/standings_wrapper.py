@@ -1,4 +1,4 @@
-from euroleague_api.src.euroleague_api.standings import Standings
+from euroleague_api.standings import Standings
 from euroleague_api_wrappers.season_utils import get_current_season_code, get_latest_round
 
 def get_euroleague_standings():
