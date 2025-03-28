@@ -8,7 +8,7 @@ from flask_cors import CORS
 from scrapper.scrapper import get_live_matches, get_match_details
 from euroleague_api_wrappers.standings_wrapper import get_euroleague_standings
 from euroleague_api_wrappers.scheduled_games_wrapper import get_scheduled_matches
-from euroleague_api_wrappers.played_matches_wrapper import get_played_matches
+from euroleague_api_wrappers.played_matches_wrapper import get_played_matches, get_all_played_matches
 from euroleague_api_wrappers.season_utils import get_current_season_code, get_latest_round
 
 from live_cache_manager import (
@@ -35,15 +35,27 @@ def current_round():
     except Exception as e:
         print("❌ Error fetching current round:", e)
         return jsonify({"error": "Could not fetch round"}), 500
+    
+@app.route("/api/all_played_matches", methods=["GET"])
+def api_all_played_matches():
+    try:
+        matches = get_all_played_matches()
+        return jsonify(matches)
+    except Exception as e:
+        print(f"❌ Error en /api/all_played_matches: {e}")
+        return jsonify([]), 500
+
 
 @app.route("/api/played_matches", methods=["GET"])
 def api_played_matches():
     try:
-        matches = get_played_matches()
+        round_param = request.args.get("round", default=None, type=int)
+        matches = get_played_matches(round=round_param)
         return jsonify(matches)
     except Exception as e:
         print(f"❌ Error en /api/played_matches: {e}")
         return jsonify([]), 500
+
 
 
 @app.route("/api/live_matches", methods=["GET"])

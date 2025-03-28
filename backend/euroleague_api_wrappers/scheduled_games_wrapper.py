@@ -30,7 +30,8 @@ def parse_scheduled_matches(xml_data):
             "home_team": item.findtext("hometeam", ""),
             "away_team": item.findtext("awayteam", ""),
             "arena": item.findtext("arenaname", ""),
-            "datetime": dt.strftime("%Y-%m-%d %H:%M")
+            "datetime": dt.strftime("%Y-%m-%d %H:%M"),
+            "round": gameday
         }
 
         if dt > now:
@@ -54,8 +55,13 @@ def get_scheduled_matches(round=None):
         else:
             return []
 
-    # Si no se pasa ronda, devolvemos los partidos de la primera jornada
-    next_gameday = sorted(grouped_matches.keys())[0]
-    print(f"📅 Mostrando partidos programados de la jornada {next_gameday}")
-    return grouped_matches[next_gameday]
+    # Si no se pasa ronda, devolvemos TODOS los partidos de todas las jornadas con 'round'
+    print("📊 Devolviendo todos los partidos programados agrupados por jornada")
 
+    all_matches = []
+    for gameday, match_list in grouped_matches.items():
+        for match in match_list:
+            match["round"] = gameday  # Redundante si ya viene, pero asegura que esté
+            all_matches.append(match)
+
+    return all_matches

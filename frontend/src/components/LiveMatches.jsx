@@ -21,19 +21,6 @@ const LiveMatches = () => {
   const [standings, setStandings] = useState([]);
   const [currentRound, setCurrentRound] = useState(null);
 
-
-  const teamNameOverrides = {
-    "Olimpia Milano": "EA7 Emporio Armani Milan",
-  };
-
-  const getTeamData = (teamName) => {
-    const normalizedName = teamNameOverrides[teamName] || teamName;
-    return standings.find((team) =>
-      team["club.name"].toLowerCase().includes(normalizedName.toLowerCase()) ||
-      normalizedName.toLowerCase().includes(team["club.name"].toLowerCase())
-    );
-  };
-
   useEffect(() => {
     fetch("/api/euroleague_standings")
       .then((res) => res.json())
@@ -49,7 +36,6 @@ const LiveMatches = () => {
       })
       .catch((err) => console.error("Error fetching round:", err));
   }, []);
-  
 
   useEffect(() => {
     const fetchLiveMatches = () => {
@@ -91,6 +77,20 @@ const LiveMatches = () => {
     return () => clearInterval(interval);
   }, [detailsVisibility, matches]);
 
+  const normalize = (str) =>
+    str.toLowerCase().replace(/[^a-z]/g, "").slice(0, 6);
+
+  const getTeamData = (teamName) => {
+    const target = normalize(teamName);
+    const team = standings.find(
+      (team) => normalize(team["club.name"]) === target
+    );
+    if (!team) {
+      console.warn("❌ Team not found in standings:", teamName);
+    }
+    return team;
+  };
+
   const handleViewDetails = (url) => {
     setDetailsVisibility((prev) => ({ ...prev, [url]: !prev[url] }));
   };
@@ -106,7 +106,7 @@ const LiveMatches = () => {
       <ResponsiveContainer width="100%" height={200}>
         <BarChart layout="vertical" data={data} margin={{ left: 40 }}>
           <XAxis type="number" hide />
-          <YAxis type="category" dataKey="name" tick={{ fill: '#4B5563' }} />
+          <YAxis type="category" dataKey="name" tick={{ fill: "#4B5563" }} />
           <Tooltip />
           <Legend />
           <Bar dataKey="Home" fill="#3B82F6">
@@ -126,7 +126,9 @@ const LiveMatches = () => {
         Live Matches
       </h2>
       {currentRound && (
-        <p className="text-center text-sm text-gray-400 mb-4">Round {currentRound}</p>
+        <p className="text-center text-sm text-gray-400 mb-4">
+          Round {currentRound}
+        </p>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -135,7 +137,9 @@ const LiveMatches = () => {
             <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
           </div>
         ) : matches.length === 0 ? (
-          <p className="text-gray-400 text-center col-span-full">No live matches found</p>
+          <p className="text-gray-400 text-center col-span-full">
+            No live matches found
+          </p>
         ) : (
           matches.map((match, index) => {
             const homeTeam = getTeamData(match.team1);
@@ -148,8 +152,12 @@ const LiveMatches = () => {
                 className="bg-gray-900 p-4 rounded-lg shadow-md hover:shadow-xl transition duration-200"
               >
                 <MatchCard
-                  home={<TeamDisplay team={homeTeam} fallback={match.team1} />}
-                  away={<TeamDisplay team={awayTeam} fallback={match.team2} />}
+                  home={
+                    <TeamDisplay team={homeTeam} fallback={match.team1} />
+                  }
+                  away={
+                    <TeamDisplay team={awayTeam} fallback={match.team2} />
+                  }
                   score={match.score}
                   status={`${match.quarter} - ${match.time}`}
                 />
@@ -158,20 +166,31 @@ const LiveMatches = () => {
                     onClick={() => handleViewDetails(match.url)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
                   >
-                    {detailsVisibility[match.url] ? "Close Details" : "View Details"}
+                    {detailsVisibility[match.url]
+                      ? "Close Details"
+                      : "View Details"}
                   </button>
                 </div>
 
                 {detailsVisibility[match.url] && details && (
                   <div className="mt-4 bg-gray-800 p-4 rounded-lg">
-                    <h4 className="text-white font-semibold mb-2">Points by Quarter</h4>
+                    <h4 className="text-white font-semibold mb-2">
+                      Points by Quarter
+                    </h4>
                     <table className="w-full text-sm text-gray-300">
                       <thead>
                         <tr>
                           <th className="text-left w-8"></th>
-                          {"1st 2nd 3rd 4th OT Total".split(" ").map((label, i) => (
-                            <th key={i} className="px-2 py-1 text-center">{label}</th>
-                          ))}
+                          {"1st 2nd 3rd 4th OT Total"
+                            .split(" ")
+                            .map((label, i) => (
+                              <th
+                                key={i}
+                                className="px-2 py-1 text-center"
+                              >
+                                {label}
+                              </th>
+                            ))}
                         </tr>
                       </thead>
                       <tbody>
@@ -186,9 +205,13 @@ const LiveMatches = () => {
                             )}
                           </td>
                           {details.home_quarter_scores.map((score, i) => (
-                            <td key={i} className="text-center">{score}</td>
+                            <td key={i} className="text-center">
+                              {score}
+                            </td>
                           ))}
-                          <td className="text-center font-bold">{details.home_total}</td>
+                          <td className="text-center font-bold">
+                            {details.home_total}
+                          </td>
                         </tr>
                         <tr>
                           <td className="text-center">
@@ -201,17 +224,25 @@ const LiveMatches = () => {
                             )}
                           </td>
                           {details.away_quarter_scores.map((score, i) => (
-                            <td key={i} className="text-center">{score}</td>
+                            <td key={i} className="text-center">
+                              {score}
+                            </td>
                           ))}
-                          <td className="text-center font-bold">{details.away_total}</td>
+                          <td className="text-center font-bold">
+                            {details.away_total}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
 
                     <div className="mt-4">
-                      <h4 className="text-white font-semibold mb-2">Top 3 Players</h4>
+                      <h4 className="text-white font-semibold mb-2">
+                        Top 3 Players
+                      </h4>
                       {details.top_player_stats === "Not found" ? (
-                        <p className="text-gray-400">No top players available</p>
+                        <p className="text-gray-400">
+                          No top players available
+                        </p>
                       ) : (
                         <ul className="text-gray-300 space-y-1">
                           {details.top_player_stats.map((player, i) => (
@@ -224,9 +255,13 @@ const LiveMatches = () => {
                     </div>
 
                     <div className="mt-4">
-                      <h4 className="text-white font-semibold mb-2">Team Statistics</h4>
+                      <h4 className="text-white font-semibold mb-2">
+                        Team Statistics
+                      </h4>
                       {details.team_statistics === "Not found" ? (
-                        <p className="text-gray-400">No team statistics available</p>
+                        <p className="text-gray-400">
+                          No team statistics available
+                        </p>
                       ) : (
                         renderStatisticsChart(details.team_statistics)
                       )}

@@ -1,0 +1,3 @@
+[submodule "backend/euroleague_api"]
+	path = backend/euroleague_api
+	url = https://github.com/giasemidis/euroleague_api
