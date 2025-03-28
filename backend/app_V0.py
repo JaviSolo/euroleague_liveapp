@@ -9,6 +9,7 @@ from scrapper.scrapper import get_live_matches, get_match_details
 from euroleague_api_wrappers.standings_wrapper import get_euroleague_standings
 from euroleague_api_wrappers.scheduled_games_wrapper import get_scheduled_matches
 from euroleague_api_wrappers.played_matches_wrapper import get_played_matches
+from euroleague_api_wrappers.season_utils import get_current_season_code, get_latest_round
 
 from live_cache_manager import (
     get_cached_live_matches,
@@ -24,6 +25,16 @@ CORS(app)
 @app.route('/')
 def home():
     return render_template("index.html")
+
+@app.route("/api/current_round")
+def current_round():
+    try:
+        season = get_current_season_code()
+        round_number = get_latest_round(season)
+        return jsonify({"round": round_number})
+    except Exception as e:
+        print("❌ Error fetching current round:", e)
+        return jsonify({"error": "Could not fetch round"}), 500
 
 @app.route("/api/played_matches", methods=["GET"])
 def api_played_matches():
